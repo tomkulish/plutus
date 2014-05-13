@@ -10,6 +10,10 @@ var express = require("express"),
   
 var env = process.env.NODE_ENV = process.env.NODE_ENV  || 'development';
 
+app.configure(function() {
+    app.set('views', __dirname + '/server/views');
+    app.set('view_engine', 'jade');
+    })
 var morgan         = require('morgan');
 var bodyParser     = require('body-parser');
 var methodOverride = require('method-override');
@@ -20,6 +24,9 @@ app.use(bodyParser());
 app.use(express.static(__dirname + '/client'));
 app.use(morgan('dev'));
 
+app.get('*', function(req, res) {
+    res.render('index');
+})
 
 //app.listen(port);
 //console.log('Now serving the app at http://localhost:' + port + '/');
