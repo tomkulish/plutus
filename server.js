@@ -7,6 +7,8 @@ var socketio = require('socket.io');
 var express = require("express"),
   app     = express(),
   port    = parseInt(process.env.PORT, 10) || 8080;
+  
+var env = process.env.NODE_ENV = process.env.NODE_ENV  || 'development';
 
 var morgan         = require('morgan');
 var bodyParser     = require('body-parser');
