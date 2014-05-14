@@ -33,8 +33,8 @@ app.use(stylus.middleware(
     ));
 
 
-app.set('views', __dirname + '/server/views');
-app.set('view engine', 'jade');
+//app.set('views', __dirname + '/server/views');
+//app.set('view engine', 'jade');
 
 
 app.get('*', function(req, res) {

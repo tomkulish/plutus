@@ -1,11 +1,11 @@
 // Make sure to include the `ui.router` module as a dependency
 'use strict';
 angular.module('plutusApp', [
+  'plutusApp.contacts',
   'ui.router', 
   'ngAnimate',
   'ngResource',
   'ngSanitize'
-
 ])
 
 .run(
