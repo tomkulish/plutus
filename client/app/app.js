@@ -30,6 +30,8 @@ angular.module('plutusApp', [
       // Redirects and Otherwise //
       /////////////////////////////
 
+    //var access = routingConfig.accessLevels;
+
       // Use $urlRouterProvider to configure any redirects (when) and invalid urls (otherwise).
       $urlRouterProvider
 
@@ -70,7 +72,34 @@ angular.module('plutusApp', [
             '<a href="#/user/42">Bob</a>—to see a url redirect in action.</p>'
 
         })
+        
+        // PUBLIC
+        .state('public', {
+            abstract: true,
+            template: "<ui-view/>",
+            data: {
+  //              access: access.public
+            }
+        })
+        .state('public.404', {
+            url: '/404/',
+            templateUrl: '404'
+        })
 
+        // ANYNOMUS Routes
+        .state('anon', {
+            abstract: true,
+            template: "<ui-view/>",
+            data: {
+ //              access: access.anon
+            }
+        })
+        .state('login', {
+            url: '/login/',
+            templateUrl: 'app/login/login.html',
+            controller: 'LoginCtrl'
+        })
+        
         ///////////
         // About //
         ///////////

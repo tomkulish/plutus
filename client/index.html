@@ -21,7 +21,6 @@ your experience.</p>
     <!-- Add your site or application content here -->
     <div class="navbar navbar-fixed-top">
       <div class="container">
-
         <!-- ui-sref is a great directive for linking a state location with an anchor link.
              You should almost always use ui-sref instead of href on your links when you want
              then to navigate to a state. When this link is clicked it will take the application
@@ -35,12 +34,14 @@ your experience.</p>
           <li ng-class="{active: $state.includes('contacts')}"><a ui-sref="contacts.list">Contacts</a></li>
           <li ui-sref-active="active"><a ui-sref="about">About</a></li>
         </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li ng-class="{active: $state.includes('login')}"><a ui-sref="login">Login</a></li>
+        </ul>
         <!-- Here is a named ui-view. ui-views don't have to be named, but we'll be populate this
              on from various different child states and we want a name to help us target. -->
         <p ui-view="hint" class="navbar-text pull-right"></p>
       </div>
     </div>
-
     <div ui-view class="container slide" style="padding-top: 80px;"></div>
     <hr>
     <pre>
@@ -86,6 +87,7 @@ your experience.</p>
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="app/app.js"></script>
     <script src="app/contacts/contacts.js"></script>
+    <!--<script src="app/login/login.js"></script>-->
     <!--<script src="app/controllers/main.js"></script>-->
     <!-- endbuild -->
 </body>
