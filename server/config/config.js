@@ -6,7 +6,11 @@ var rootPath = path.normalize(__dirname + '/../../');
 
 module.exports = {
     development: {
-        db: '',
+        db: 'mysql://wikid:wikid@localhost/;insecureAuth: true',
+        dbHost: 'localhost',
+        dbUser: 'wikid',
+        dbPassword: 'wikid',
+        dbDatabase: 'si2k4',
         rootPath: rootPath,
         port: process.env.PORT || 3000
     },

@@ -1,3 +1,5 @@
+
+// Completely ignoring this due to the fact we are calling this plutusApp.login :-)
 angular.module('plutusApp.login', [
   'ui.router'
 ])
@@ -19,3 +21,17 @@ angular.module('plutusApp.login', [
           templateUrl: 'app/login/login.html'
             })
     }]);
+
+// This is being used though!
+angular.module('plutusApp').controller('LoginCtrl', function ($scope, $http) {
+    $scope.signin = function(username, password) {
+        console.log("I'm not done yet");
+        $http.post('/login', {username:username, password:password}).then(function(response) {
+            if(response.data.success) {
+                console.log('logged in!');
+            } else {
+                console.log('failed to login!');
+            }
+        })
+    }
+});
