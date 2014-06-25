@@ -5,7 +5,8 @@ angular.module('plutusApp', [
   'ui.router', 
   'ngAnimate',
   'ngResource',
-  'ngSanitize'
+  'ngSanitize',
+  'toaster'
 ])
 
 .run(
