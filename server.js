@@ -31,7 +31,8 @@ passport.use(new LocalStrategy(
             if (err) throw err;
             console.log("Number of rows " + rows.length);
             if (rows.length >= 1) {
-                console.log("Found user " + username);
+//                var message = "{\"user_name\":\"" + rows[0].user_name + "\"}";
+                console.log("Found user " + rows[0].user_name);
                 return done (null, rows[0].user_name);
             }
             else {
@@ -43,14 +44,15 @@ passport.use(new LocalStrategy(
 ));
 
 passport.serializeUser(function (user, done) {
-    console.log('serializeUser now');
+    console.log('serializeUser now' + user);
+    console.log('serializeUser now' + user.user_name);
     if(user) {
         done(null, user);
     }
 });
 
 passport.deserializeUser(function(user, done) {
-    console.log("deserializeUser now");
+    console.log("deserializeUser now" + user);
     if(user) {
         return done(null, user);
     } else {

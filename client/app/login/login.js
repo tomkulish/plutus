@@ -23,16 +23,14 @@ angular.module('plutusApp.login', [
     }]);
 
 // This is being used though!
-angular.module('plutusApp').controller('LoginCtrl', function ($scope, $http, userIdentity, plutusNotifier) {
+angular.module('plutusApp').controller('LoginCtrl', function ($scope, $http, plutusNotifier, plutusAuth) {
     $scope.signin = function(username, password) {
-        console.log("I'm not done yet");
-        $http.post('/login', {username:username, password:password}).then(function(response) {
-            if(response.data.success) {
-                userIdentity.currentUser = response.data.username;
-                plutusNotifier.notify('You have succesfully signed in!');
+        plutusAuth.authenticateUser(username, password).then(function (success) {
+            if(success) {
+                plutusNotifier.notify('success','You have succesfully signed in!');
             } else {
-                plutusNotifier.notify('Username/Password combination incorrect');
+                plutusNotifier.notify('error','Username/Password combination incorrect');
             }
-        })
+        });
     }
 });

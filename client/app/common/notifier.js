@@ -10,8 +10,8 @@
 // probably want to fix the pop.
 angular.module('plutusApp').factory('plutusNotifier', function(toaster) {
     return {
-        notify: function(msg) {
-            toaster.pop(msg);
+        notify: function(type, msg) {
+            toaster.pop(type, msg);
             console.log(msg);
         }
     }
