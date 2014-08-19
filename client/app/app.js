@@ -2,6 +2,7 @@
 'use strict';
 angular.module('plutusApp', [
   'plutusApp.contacts',
+  'plutusApp.login',
   'ui.router', 
   'ngAnimate',
   'ngResource',
@@ -9,29 +10,17 @@ angular.module('plutusApp', [
   'toaster'
 ])
 
-.run(
-  [          '$rootScope', '$state', '$stateParams',
-    function ($rootScope,   $state,   $stateParams) {
-
-    // It's very handy to add references to $state and $stateParams to the $rootScope
-    // so that you can access them from any scope within your applications.For example,
-    // <li ui-sref-active="active }"> will set the <li> // to active whenever
-    // 'contacts.list' or one of its decendents is active.
-    $rootScope.$state = $state;
-    $rootScope.$stateParams = $stateParams;
-    }
-  ]
-)
-
 .config(
-  [          '$stateProvider', '$urlRouterProvider',
-    function ($stateProvider,   $urlRouterProvider) {
+  [          '$stateProvider', '$urlRouterProvider', '$locationProvider', '$httpProvider',
+    function ($stateProvider,   $urlRouterProvider, $locationProvider, $httpProvider) {
+
+     //   var access = routingConfig.accessLevels;
 
       /////////////////////////////
       // Redirects and Otherwise //
       /////////////////////////////
 
-    //var access = routingConfig.accessLevels;
+    var access = routingConfig.accessLevels;
 
       // Use $urlRouterProvider to configure any redirects (when) and invalid urls (otherwise).
       $urlRouterProvider
@@ -70,7 +59,10 @@ angular.module('plutusApp', [
             '<p>Use the menu above to navigate. ' +
             'Pay attention to the <code>$state</code> and <code>$stateParams</code> values below.</p>' +
             '<p>Click these links—<a href="#/c?id=1">Alice</a> or ' +
-            '<a href="#/user/42">Bob</a>—to see a url redirect in action.</p>'
+            '<a href="#/user/42">Bob</a>—to see a url redirect in action.</p>',
+          data: {
+                access: access.user
+          }
 
         })
         
@@ -79,7 +71,7 @@ angular.module('plutusApp', [
             abstract: true,
             template: "<ui-view/>",
             data: {
-  //              access: access.public
+                access: access.public
             }
         })
         .state('public.404', {
@@ -92,14 +84,19 @@ angular.module('plutusApp', [
             abstract: true,
             template: "<ui-view/>",
             data: {
- //              access: access.anon
+               access: access.anon
             }
         })
-        .state('login', {
-            url: '/login/',
-            templateUrl: 'app/login/login.html',
-            controller: 'LoginCtrl'
-        })
+        .state('anon.login', {
+              url: '/login/',
+              templateUrl: 'app/login/login.html',
+              controller: 'LoginCtrl'
+          })
+       // .state('login', {
+      //      url: '/login/',
+      //      templateUrl: 'app/login/login.html',
+       //     controller: 'LoginCtrl'
+      //  })
         
         ///////////
         // About //
@@ -120,8 +117,102 @@ angular.module('plutusApp', [
                          '<li><a href="https://github.com/angular-ui/ui-router/wiki/Quick-Reference">API Reference</a></li>' +
                        '</ul>';
               }, 100);
-            }]
-        })
+            }],
+              data: {
+                  access: access.user
+              }
+        });
+
+        $urlRouterProvider.otherwise('/404');
+
+        // FIX for trailing slashes. Gracefully "borrowed" from https://github.com/angular-ui/ui-router/issues/50
+        $urlRouterProvider.rule(function($injector, $location) {
+            if($location.protocol() === 'file')
+                return;
+
+            var path = $location.path()
+            // Note: misnomer. This returns a query object, not a search string
+                , search = $location.search()
+                , params
+                ;
+
+            // check to see if the path already ends in '/'
+            if (path[path.length - 1] === '/') {
+                return;
+            }
+
+            // If there was no search string / query params, return with a `/`
+            if (Object.keys(search).length === 0) {
+                return path + '/';
+            }
+
+            // Otherwise build the search string and return a `/?` prefix
+            params = [];
+            angular.forEach(search, function(v, k){
+                params.push(k + '=' + v);
+            });
+            return path + '/?' + params.join('&');
+        });
+
+        $locationProvider.html5Mode(true);
+
+        $httpProvider.interceptors.push(function($q, $location) {
+            return {
+                'responseError': function(response) {
+                    if(response.status === 401 || response.status === 403) {
+                        $location.path('/login');
+                    }
+                    return $q.reject(response);
+                }
+            };
+        });
     }
   ]
+)
+
+    .run(
+    [          '$rootScope', '$state', '$stateParams', 'userIdentity',
+        function ($rootScope,   $state,   $stateParams, userIdentity) {
+
+            // It's very handy to add references to $state and $stateParams to the $rootScope
+            // so that you can access them from any scope within your applications.For example,
+            // <li ui-sref-active="active }"> will set the <li> // to active whenever
+            // 'contacts.list' or one of its decendents is active.
+            $rootScope.$state = $state;
+            $rootScope.$stateParams = $stateParams;
+
+            $rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
+                if(!userIdentity.accessAllowed(toState.data.access)) {
+                    console.log("Event: " + event.toString());
+                    console.log("fromStateURL: " + fromState.url);
+                    console.log("fromState: " + fromState.name);
+                    console.log("toState: " + toState.url);
+                    console.log("toStateName: " + toState.name);
+
+                    if (!userIdentity.isAuthenticated()) {
+                        console.log("Seems like you tried accessing a route you don't have access to... No Authenticated User");
+                        $rootScope.error = "Seems like you tried accessing a route you don't have access to...";
+                        event.preventDefault();
+
+                        console.log("fromState.url: " + fromState.url);
+                        if (fromState.url === '^') {
+                            if (userIdentity.goHome()) {
+                                console.log("Going home...");
+                                $state.go('home');
+                            } else {
+                                console.log("Going to anon.login");
+                                $rootScope.error = null;
+                                $state.go('anon.login');
+                            }
+                        }
+
+                        // For some reason it won't just do nothing after we have a from state of annon.login and I don't know why
+                    }
+                    else {
+                        console.log("You have access to the section: " + userIdentity.currentUser);
+                    }
+                }
+            });
+        }
+    ]
 );
