@@ -40,6 +40,9 @@ your experience.</p>
         <ul class="nav navbar-nav navbar-right" >
             <li ng-class="{active: $state.includes('anon.login')}"><a ui-sref="anon.login">Login</a></li>
         </ul>
+        <div id="userIdentity" data-access-level='accessLevels.user'>
+            Welcome {{ userIdentity.currentUser }} ( {{$state.current.name}} )
+        </div>
         <!-- Here is a named ui-view. ui-views don't have to be named, but we'll be populate this
              on from various different child states and we want a name to help us target. -->
         <p ui-view="hint" class="navbar-text pull-right"></p>
